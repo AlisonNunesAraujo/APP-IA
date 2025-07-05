@@ -1,0 +1,130 @@
+import { useState, useEffect } from 'react';
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  TextInput,
+  Keyboard,
+  Alert,
+  FlatList,
+} from 'react-native';
+import { styles } from './styles';
+import Header from '../../components/header';
+import { db } from '../../services/firebase';
+import {
+  collection,
+  addDoc,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { GoogleGenAI } from '@google/genai';
+
+type laista = {
+  id: string;
+  mensagemUser: string;
+  uid: string;
+  resposta: string;
+};
+
+export default function Home() {
+  const [mensagens, setMensagens] = useState('');
+  const [resposta, setResposta] = useState<string | undefined>();
+  const [list, setList] = useState<laista[]>([]);
+
+  const ai = new GoogleGenAI({
+    apiKey: 'AIzaSyCveaBX494NX4tYaWkwMjxC0lRpIVr9L6A',
+  });
+  async function PostMensagens() {
+    if (mensagens === '') {
+      Alert.alert('Digite uma mensagem');
+      return;
+    }
+    Main();
+
+    const mensagensRef = addDoc(collection(db, 'mensagens'), {
+      mensagemUser: mensagens,
+      uid: '123',
+      resposta: resposta,
+      createdAt: serverTimestamp(),
+    })
+      .then(docRef => {
+        console.log('Document written with ID: ');
+        setMensagens('');
+        Alert.alert('Mensagem enviada com sucesso');
+      })
+      .catch(error => {
+        console.error('Error adding document: ', error);
+      });
+  }
+  async function Main() {
+    const response = await ai.models
+      .generateContent({
+        model: 'gemini-2.5-flash',
+        contents: mensagens,
+      })
+      .then(response => {
+        setResposta(response.text);
+      });
+  }
+
+  useEffect(() => {
+    async function getData() {
+      const dataQuery = query(
+        collection(db, 'mensagens'),
+        orderBy('createdAt', 'asc'),
+      );
+      getDocs(dataQuery)
+        .then(snapshot => {
+          let list = [];
+          snapshot.forEach(doc => {
+            list.push({
+              id: doc.id,
+              mensagemUser: doc.data().mensagemUser,
+              uid: doc.data().uid,
+              resposta: doc.data().resposta,
+              createdAt: serverTimestamp(),
+            });
+
+            setList(list);
+            console.log(list);
+          });
+        })
+        .catch(error => {
+          console.error('Error adding document: ', error);
+        });
+    }
+    getData();
+  }, [Main, PostMensagens]);
+
+  return (
+    <View style={styles.container} onTouchStart={() => Keyboard.dismiss()}>
+      <Header />
+      <View>
+        <FlatList
+          style={styles.list}
+          data={list}
+          renderItem={({ item }) => (
+            <View>
+              <Text style={styles.send}>Voçê: {item.mensagemUser}</Text>
+              <Text style={styles.resIA}>{item.resposta}</Text>
+            </View>
+          )}
+        />
+      </View>
+      <View style={styles.footer}>
+        <TextInput
+          placeholder="Mensagem"
+          value={mensagens}
+          onChangeText={setMensagens}
+          style={styles.input}
+        />
+
+        <TouchableOpacity style={styles.icon} onPress={() => PostMensagens()}>
+          <Text style={styles.textEnv}>Enviar</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
