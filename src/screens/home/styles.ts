@@ -4,7 +4,7 @@ export const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
   },
   footer: {
     bottom: 0,
@@ -28,20 +28,24 @@ export const styles = StyleSheet.create({
   },
   list: {
     width: '100%',
-    height: '100%',
+    height: '80%',
     backgroundColor: '#000',
+    gap: 10
+  },
+  areaText:{
+    width: '100%',
+    height: 'auto',
+    gap: 10,
   },
   send: {
     color: '#fff',
     marginLeft: '2%',
-    gap: 10,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   resIA: {
     color: 'blue',
     marginLeft: '2%',
-    gap: 10,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   textEnv: {
     color: '#fff',

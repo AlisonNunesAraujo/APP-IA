@@ -1,13 +1,9 @@
-import Home from "./src/screens/home";
+import Home from './src/screens/home';
+import Login from './src/screens/login';
+
 
 function App() {
-
-
-  return (
-    <Home/>
-  );
+  return <Home />;
 }
-
-
 
 export default App;

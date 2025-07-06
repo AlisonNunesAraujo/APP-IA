@@ -41,6 +41,7 @@ export default function Home() {
       Alert.alert('Digite uma mensagem');
       return;
     }
+    Alert.alert('clicou');
     Main();
 
     const mensagensRef = addDoc(collection(db, 'mensagens'), {
@@ -92,11 +93,11 @@ export default function Home() {
           });
         })
         .catch(error => {
-          console.error('Error adding document: ', error);
+          console.error('Error: ', error);
         });
     }
     getData();
-  }, [Main, PostMensagens]);
+  }, [Main, PostMensagens, mensagens, resposta, list]);
 
   return (
     <View style={styles.container} onTouchStart={() => Keyboard.dismiss()}>
@@ -106,8 +107,8 @@ export default function Home() {
           style={styles.list}
           data={list}
           renderItem={({ item }) => (
-            <View>
-              <Text style={styles.send}>Voçê: {item.mensagemUser}</Text>
+            <View style={styles.areaText}>
+              <Text style={styles.send}>{item.mensagemUser}</Text>
               <Text style={styles.resIA}>{item.resposta}</Text>
             </View>
           )}
