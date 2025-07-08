@@ -21,8 +21,7 @@ import {
 } from 'firebase/firestore';
 import { GoogleGenAI } from '@google/genai';
 
-type laista = {
-  id: string;
+type laista = { 
   mensagemUser: string;
   uid: string;
   resposta: string;
@@ -42,6 +41,7 @@ export default function Home() {
       return;
     }
     Alert.alert('clicou');
+
     Main();
 
     const mensagensRef = addDoc(collection(db, 'mensagens'), {
@@ -50,7 +50,7 @@ export default function Home() {
       resposta: resposta,
       createdAt: serverTimestamp(),
     })
-      .then(docRef => {
+      .then(() => {
         console.log('Document written with ID: ');
         setMensagens('');
         Alert.alert('Mensagem enviada com sucesso');
@@ -65,15 +65,20 @@ export default function Home() {
         model: 'gemini-2.5-flash',
         contents: mensagens,
       })
+     
       .then(response => {
         setResposta(response.text);
-      });
+         console.log(response);
+      })
+      .catch(error => {
+        Alert.alert("erro na main ");
+      })
   }
 
   useEffect(() => {
     async function getData() {
       const dataQuery = query(
-        collection(db, 'mensagens'),
+        collection(db, 'mensagens'),   
         orderBy('createdAt', 'asc'),
       );
       getDocs(dataQuery)
@@ -81,7 +86,6 @@ export default function Home() {
           let list = [];
           snapshot.forEach(doc => {
             list.push({
-              id: doc.id,
               mensagemUser: doc.data().mensagemUser,
               uid: doc.data().uid,
               resposta: doc.data().resposta,
