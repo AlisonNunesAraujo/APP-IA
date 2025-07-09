@@ -1,9 +1,15 @@
-import Home from './src/screens/home';
-import Login from './src/screens/login';
-
+import Prive from "./src/routs/prive";
+import AuthContex from "./src/contextApi";
+import { NavigationContainer } from "@react-navigation/native";
 
 function App() {
-  return <Login />;
+  return(
+    <NavigationContainer>
+      <AuthContex>
+        <Prive />
+      </AuthContex>
+    </NavigationContainer>
+  )
 }
 
 export default App;

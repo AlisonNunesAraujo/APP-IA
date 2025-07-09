@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,19 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { styles } from './styles';
+
+import { ContextApi } from '../../contextApi';
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [verifiqued, setVerifiqued] = useState(true);
+
+  const {Register,Login} = useContext(ContextApi);
+  async function handleRegister() {
+    Register();
+    setVerifiqued(!verifiqued);
+  }
 
   return (
     <SafeAreaView
@@ -26,7 +35,7 @@ export default function Login() {
             <TextInput placeholder="Email" style={styles.inputs} />
             <Text style={styles.label}>Senha:</Text>
             <TextInput placeholder="Senha" style={styles.inputs} />
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={Login}>
               <Text style={styles.textButton}>Entrar</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -45,10 +54,10 @@ export default function Login() {
           <View style={styles.formItens}>
             <Text style={styles.title}>Crie sua conta</Text>
             <Text style={styles.label}>Email:</Text>
-            <TextInput placeholder="Email" style={styles.inputs} />
+            <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.inputs} />
             <Text style={styles.label}>Senha:</Text>
-            <TextInput placeholder="Senha" style={styles.inputs} />
-            <TouchableOpacity style={styles.button}>
+          <TextInput placeholder="Senha" value={password} onChangeText={setPassword} style={styles.inputs} />
+            <TouchableOpacity style={styles.button} onPress={handleRegister}>
               <Text style={styles.textButton}>Criar</Text>
             </TouchableOpacity>
             <TouchableOpacity

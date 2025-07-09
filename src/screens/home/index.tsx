@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Text,
   TouchableOpacity,
@@ -7,6 +7,7 @@ import {
   Keyboard,
   Alert,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { styles } from './styles';
 import Header from '../../components/header';
@@ -21,16 +22,19 @@ import {
 } from 'firebase/firestore';
 import { GoogleGenAI } from '@google/genai';
 
-type laista = { 
+type laista = {
   mensagemUser: string;
   uid: string;
   resposta: string;
 };
 
+
 export default function Home() {
   const [mensagens, setMensagens] = useState('');
   const [resposta, setResposta] = useState<string | undefined>();
   const [list, setList] = useState<laista[]>([]);
+  const [loading, setLoading] = useState(false);
+  const flatListRef = useRef<FlatList>(null);
 
   const ai = new GoogleGenAI({
     apiKey: 'AIzaSyCveaBX494NX4tYaWkwMjxC0lRpIVr9L6A',
@@ -40,8 +44,8 @@ export default function Home() {
       Alert.alert('Digite uma mensagem');
       return;
     }
-    Alert.alert('clicou');
-
+    Keyboard.dismiss();
+    setLoading(true);
     Main();
 
     const mensagensRef = addDoc(collection(db, 'mensagens'), {
@@ -51,13 +55,16 @@ export default function Home() {
       createdAt: serverTimestamp(),
     })
       .then(() => {
-        console.log('Document written with ID: ');
+       
+        
         setMensagens('');
-        Alert.alert('Mensagem enviada com sucesso');
+        setLoading(false);
       })
       .catch(error => {
         console.error('Error adding document: ', error);
+        setLoading(false);
       });
+    setLoading(false);
   }
   async function Main() {
     const response = await ai.models
@@ -65,20 +72,19 @@ export default function Home() {
         model: 'gemini-2.5-flash',
         contents: mensagens,
       })
-     
+
       .then(response => {
         setResposta(response.text);
-         console.log(response);
       })
       .catch(error => {
-        Alert.alert("erro na main ");
-      })
+        Alert.alert('erro na main ');
+      });
   }
 
   useEffect(() => {
     async function getData() {
       const dataQuery = query(
-        collection(db, 'mensagens'),   
+        collection(db, 'mensagens'),
         orderBy('createdAt', 'asc'),
       );
       getDocs(dataQuery)
@@ -91,17 +97,21 @@ export default function Home() {
               resposta: doc.data().resposta,
               createdAt: serverTimestamp(),
             });
-
             setList(list);
-            console.log(list);
+            
           });
+          
+
+            setTimeout(() => {
+              flatListRef.current?.scrollToEnd({ animated: true });
+            }, 600);
         })
         .catch(error => {
-          console.error('Error: ', error);
+          Alert.alert('Algo deu errado!');
         });
     }
     getData();
-  }, [Main, PostMensagens, mensagens, resposta, list]);
+  }, [Main, PostMensagens, resposta, mensagens]);
 
   return (
     <View style={styles.container} onTouchStart={() => Keyboard.dismiss()}>
@@ -109,6 +119,7 @@ export default function Home() {
       <View>
         <FlatList
           style={styles.list}
+          ref={flatListRef}
           data={list}
           renderItem={({ item }) => (
             <View style={styles.areaText}>
@@ -127,7 +138,11 @@ export default function Home() {
         />
 
         <TouchableOpacity style={styles.icon} onPress={() => PostMensagens()}>
-          <Text style={styles.textEnv}>Enviar</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.textEnv}>Enviar</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
