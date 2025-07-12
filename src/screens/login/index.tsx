@@ -15,10 +15,17 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [verifiqued, setVerifiqued] = useState(true);
+  
 
   const {Register,Login} = useContext(ContextApi);
+
   async function handleRegister() {
-    Register();
+    Register({ email, password });
+    setVerifiqued(!verifiqued);
+  }
+
+  async function handleLogin() {
+    Login({ email, password });
     setVerifiqued(!verifiqued);
   }
 
@@ -32,10 +39,10 @@ export default function Login() {
           <View style={styles.formItens}>
             <Text style={styles.title}>Login</Text>
             <Text style={styles.label}>Email:</Text>
-            <TextInput placeholder="Email" style={styles.inputs} />
+            <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.inputs} />
             <Text style={styles.label}>Senha:</Text>
-            <TextInput placeholder="Senha" style={styles.inputs} />
-            <TouchableOpacity style={styles.button} onPress={Login}>
+            <TextInput placeholder="Senha" value={password} onChangeText={setPassword} style={styles.inputs} />
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.textButton}>Entrar</Text>
             </TouchableOpacity>
             <TouchableOpacity

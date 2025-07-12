@@ -12,9 +12,18 @@ type User = {
     uid: string;
   };
   verifiqued: boolean | string;
-  Register: () => void;
-  Login: () => void;
+  Register:(info: createUser) => Promise<void>;
+  Login: (info: LoginUser) => Promise<void>;
 };
+
+type createUser = {
+  email: string;
+  password: string;
+}
+type LoginUser = {
+  email: string;
+  password: string;
+}
 
 export const ContextApi = createContext({} as User);
 
@@ -25,35 +34,36 @@ export default function AuthContex({ children }: { children: ReactNode }) {
   });
   const verifiqued = user?.email && user?.uid;
 
-  async function Register() {
+  async function Register({ email, password }: createUser) {
     try {
       const response = await createUserWithEmailAndPassword(
         auth,
-        'a@gmail.com',
-        '123456',
+        email,
+        password,
       ).then(() => {
-        Alert.alert('cadastrado com sucesso');
+       
         setUser({
-          email: 'a@gmail.com',
-          uid: '123456',
+          email: email,
+          uid: password,
         });
+         Alert.alert('cadastrado com sucesso');
       });
     } catch (error) {
       Alert.alert('erro ao cadastrar');
     }
   }
 
-  async function Login() {
+  async function Login({ email, password }: LoginUser) {
     try {
       const response = await signInWithEmailAndPassword(
         auth,
-        'a@gmail.com',
-        '123456',
+        email,
+        password,
       ).then(() => {
         Alert.alert('entrou com sucesso');
         setUser({
-          email: 'a@gmail.com',
-          uid: '123456',
+          email: email,
+          uid: password,
         });
       });
     } catch (error) {

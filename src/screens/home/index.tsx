@@ -28,7 +28,6 @@ type laista = {
   resposta: string;
 };
 
-
 export default function Home() {
   const [mensagens, setMensagens] = useState('');
   const [resposta, setResposta] = useState<string | undefined>();
@@ -55,8 +54,6 @@ export default function Home() {
       createdAt: serverTimestamp(),
     })
       .then(() => {
-       
-        
         setMensagens('');
         setLoading(false);
       })
@@ -98,20 +95,18 @@ export default function Home() {
               createdAt: serverTimestamp(),
             });
             setList(list);
-            
           });
-          
 
-            setTimeout(() => {
-              flatListRef.current?.scrollToEnd({ animated: true });
-            }, 600);
+          setTimeout(() => {
+            flatListRef.current?.scrollToEnd({ animated: true });
+          }, 600);
         })
         .catch(error => {
           Alert.alert('Algo deu errado!');
         });
     }
     getData();
-  }, [Main, PostMensagens, resposta, mensagens]);
+  }, [Main, PostMensagens]);
 
   return (
     <View style={styles.container} onTouchStart={() => Keyboard.dismiss()}>
