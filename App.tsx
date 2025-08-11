@@ -3,7 +3,7 @@ import Login from './src/screens/login';
 
 
 function App() {
-  return <Home />;
+  return <Login />;
 }
 
 export default App;

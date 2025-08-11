@@ -21,83 +21,69 @@ import {
 } from 'firebase/firestore';
 import { GoogleGenAI } from '@google/genai';
 
-type laista = {
-  id: string;
-  mensagemUser: string;
+type DataUsers = {
+  messageUser: string;
+  messageIA: string;
   uid: string;
-  resposta: string;
+  created: Date;
 };
 
 export default function Home() {
-  const [mensagens, setMensagens] = useState('');
-  const [resposta, setResposta] = useState<string | undefined>();
-  const [list, setList] = useState<laista[]>([]);
+ 
+  const [list, setList] = useState<DataUsers[]>([]);
+  const [message, setMessage] = useState<string>('');
 
   const ai = new GoogleGenAI({
     apiKey: 'AIzaSyCveaBX494NX4tYaWkwMjxC0lRpIVr9L6A',
   });
-  async function PostMensagens() {
-    if (mensagens === '') {
-      Alert.alert('Digite uma mensagem');
+  async function postMessage() {
+    if (message === '') {
+      Alert.alert('Por favor, insira uma mensagem.');
       return;
     }
-    Alert.alert('clicou');
-    Main();
 
-    const mensagensRef = addDoc(collection(db, 'mensagens'), {
-      mensagemUser: mensagens,
-      uid: '123',
-      resposta: resposta,
-      createdAt: serverTimestamp(),
-    })
-      .then(docRef => {
-        console.log('Document written with ID: ');
-        setMensagens('');
-        Alert.alert('Mensagem enviada com sucesso');
-      })
-      .catch(error => {
-        console.error('Error adding document: ', error);
-      });
-  }
-  async function Main() {
-    const response = await ai.models
-      .generateContent({
+    try {
+      const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: mensagens,
-      })
-      .then(response => {
-        setResposta(response.text);
+        contents: message,
       });
+
+      await addDoc(collection(db, 'message'), {
+        messageUser: message,
+        messageIA: response.text,
+        created: serverTimestamp(),
+        mobile: true,
+        // uid: user.uid,
+      });
+      Alert.alert('Mensagem enviada com sucesso!');
+      setMessage('');
+    } catch (error) {
+      console.error('Erro ao enviar mensagem: ', error);
+      Alert.alert('Erro ao enviar mensagem. Tente novamente.');
+    }
   }
+ 
 
   useEffect(() => {
-    async function getData() {
-      const dataQuery = query(
-        collection(db, 'mensagens'),
-        orderBy('createdAt', 'asc'),
-      );
-      getDocs(dataQuery)
-        .then(snapshot => {
-          let list = [];
-          snapshot.forEach(doc => {
-            list.push({
-              id: doc.id,
-              mensagemUser: doc.data().mensagemUser,
-              uid: doc.data().uid,
-              resposta: doc.data().resposta,
-              createdAt: serverTimestamp(),
-            });
+    async function getMessages() {
+      const dataRef = collection(db, 'message');
 
-            setList(list);
-            console.log(list);
-          });
-        })
-        .catch(error => {
-          console.error('Error: ', error);
-        });
+      getDocs(dataRef).then(snapshot => {
+        let list: DataUsers[] = [];
+
+        snapshot.forEach(doc =>
+          list.push({
+            messageUser: doc.data().messageUser,
+            messageIA: doc.data().messageIA,
+            uid: doc.data().uid,
+            created: doc.data().created,
+          }),
+          setList(list)
+        );
+      });
     }
-    getData();
-  }, [Main, PostMensagens, mensagens, resposta, list]);
+    getMessages();
+  }, [list]);
 
   return (
     <View style={styles.container} onTouchStart={() => Keyboard.dismiss()}>
@@ -108,8 +94,8 @@ export default function Home() {
           data={list}
           renderItem={({ item }) => (
             <View style={styles.areaText}>
-              <Text style={styles.send}>{item.mensagemUser}</Text>
-              <Text style={styles.resIA}>{item.resposta}</Text>
+              <Text style={styles.send}>{item.messageUser}</Text>
+              <Text style={styles.resIA}>{item.messageIA}</Text>
             </View>
           )}
         />
@@ -117,12 +103,12 @@ export default function Home() {
       <View style={styles.footer}>
         <TextInput
           placeholder="Mensagem"
-          value={mensagens}
-          onChangeText={setMensagens}
+          value={message}
+          onChangeText={setMessage}
           style={styles.input}
         />
 
-        <TouchableOpacity style={styles.icon} onPress={() => PostMensagens()}>
+        <TouchableOpacity style={styles.icon} onPress={() => postMessage()}>
           <Text style={styles.textEnv}>Enviar</Text>
         </TouchableOpacity>
       </View>
