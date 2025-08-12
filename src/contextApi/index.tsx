@@ -1,15 +1,10 @@
-<<<<<<< HEAD
 import { createContext, ReactNode, useState, useEffect } from 'react';
 import { Alert } from 'react-native';
-=======
-import { createContext, useState } from 'react';
->>>>>>> login
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { auth } from '../services/firebase';
-<<<<<<< HEAD
 
 type User = {
   user: {
@@ -73,7 +68,22 @@ export default function AuthContex({ children }: { children: ReactNode }) {
       });
     } catch (error) {
       Alert.alert('erro ao cadastrar');
-=======
+    }
+  }
+
+  return (
+    <ContextApi.Provider value={{ user, Register, Login, verifiqued }}>
+      {children}
+    </ContextApi.Provider>
+  );
+}
+
+import { createContext, useState } from 'react';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
+import { auth } from '../services/firebase';
 import { Alert } from 'react-native';
 import { db } from '../services/firebase';
 import { addDoc, collection } from 'firebase/firestore';
@@ -146,19 +156,12 @@ export default function AuthContext({
     } catch (error) {
       Alert.alert('Erro ao fazer login, tente novamente.');
       console.error('Error logging in: ', error);
->>>>>>> login
     }
   }
 
   return (
-<<<<<<< HEAD
-    <ContextApi.Provider value={{ user, Register, Login, verifiqued }}>
-      {children}
-    </ContextApi.Provider>
-=======
     <AppContext.Provider value={{ user, createUser, verifiqued, Login }}>
       {children}
     </AppContext.Provider>
->>>>>>> login
   );
 }
