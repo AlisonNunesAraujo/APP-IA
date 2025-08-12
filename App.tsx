@@ -1,9 +1,18 @@
-import Home from './src/screens/home';
-import Login from './src/screens/login';
+import { NavigationContainer } from "@react-navigation/native";
+import Routes from "./src/routs/routSTack";
+import ControlledRoutes from "./src/routs/controledRouts";
+import { useContext } from "react";
+import AuthContext from "./src/contextApi";
 
 
 function App() {
-  return <Login />;
+  return (
+    <NavigationContainer>
+      <AuthContext>
+        <ControlledRoutes />
+      </AuthContext>
+    </NavigationContainer>
+  );
 }
 
 export default App;
