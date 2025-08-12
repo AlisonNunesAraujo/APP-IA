@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect} from 'react';
 import {
   Text,
   TouchableOpacity,
@@ -7,7 +7,6 @@ import {
   Keyboard,
   Alert,
   FlatList,
-  ActivityIndicator,
 } from 'react-native';
 import { styles } from './styles';
 import Header from '../../components/header';
@@ -16,8 +15,6 @@ import {
   collection,
   addDoc,
   getDocs,
-  orderBy,
-  query,
   serverTimestamp,
 } from 'firebase/firestore';
 import { GoogleGenAI } from '@google/genai';
