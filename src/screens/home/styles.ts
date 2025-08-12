@@ -27,25 +27,31 @@ export const styles = StyleSheet.create({
     marginRight: '5%',
   },
   list: {
-    width: '100%',
+    width: '95%',
     height: '80%',
     backgroundColor: '#000',
-    gap: 10
+    gap: 10,
+    marginLeft: '2.5%',
   },
-  areaText:{
+  areaText: {
     width: '100%',
     height: 'auto',
     gap: 10,
   },
   send: {
-    color: '#fff',
+    color: 'white',
+    backgroundColor: '#4caf50',
     marginLeft: '2%',
     fontWeight: '700',
+    borderRadius: 2,
   },
   resIA: {
-    color: 'blue',
+    color: 'white',
     marginLeft: '2%',
     fontWeight: '600',
+    backgroundColor: '#2196f3',
+    borderRadius: 2,
+    marginBottom: 10,
   },
   textEnv: {
     color: '#fff',
